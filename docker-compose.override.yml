@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Development overrides
+  document-watcher:
+    volumes:
+      - ./services/document-watcher:/app
+      - ./watched:/app/watched
+      - ./queue:/app/queue
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
+  ai-processor:
+    volumes:
+      - ./services/ai-processor:/app
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
+
+  notification-service:
+    volumes:
+      - ./services/notification-service/src:/app/src
+      - ./services/notification-service/package.json:/app/package.json
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    command: npm run dev
+
+  web-dashboard:
+    volumes:
+      - ./services/web-dashboard/src:/app/src
+      - ./services/web-dashboard/public:/app/public
+    environment:
+      - REACT_APP_API_URL=http://localhost:8001
+      - NODE_ENV=development
+    command: npm start
+
+  # Additional development services
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: legal-automation-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@legalautomation.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    networks:
+      - legal-automation-network
+    depends_on:
+      - postgres
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: legal-automation-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - legal-automation-network
+    depends_on:
+      - redis

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "SlashCommand(/superpowers:brainstorm)",
+      "Bash(powershell:*)",
+      "SlashCommand(/speckit.analyze)",
+      "Bash(git checkout:*)",
+      "SlashCommand(/speckit.constitution)",
+      "SlashCommand(/speckit.implement)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose config:*)",
+      "Bash(/dev/null)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
